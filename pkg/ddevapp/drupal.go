@@ -18,10 +18,6 @@ import (
 	copy2 "github.com/otiai10/copy"
 )
 
-// DefaultDrupalSettingsVersion is the version used for settings.php/settings.ddev.php
-// when no known Drupal version is detected
-const DefaultDrupalSettingsVersion = "10"
-
 // DrupalSettings encapsulates all the configurations for a Drupal site.
 type DrupalSettings struct {
 	DeployName       string
@@ -123,7 +119,7 @@ func writeDrupalSettingsPHP(app *DdevApp) error {
 	} else {
 		drupalVersion, err := GetDrupalVersion(app)
 		if err != nil || drupalVersion == "" {
-			drupalVersion = DefaultDrupalSettingsVersion
+			drupalVersion = nodeps.DefaultDrupalSettingsVersion
 		}
 		appType = "drupal" + drupalVersion
 	}
@@ -190,7 +186,7 @@ func writeDrupalSettingsDdevPhp(settings *DrupalSettings, filePath string, app *
 
 	drupalVersion, err := GetDrupalVersion(app)
 	if err != nil || drupalVersion == "" {
-		drupalVersion = DefaultDrupalSettingsVersion
+		drupalVersion = nodeps.DefaultDrupalSettingsVersion
 	}
 	t, err := template.New("settings.ddev.php").ParseFS(bundledAssets, path.Join("drupal", "drupal"+drupalVersion, "settings.ddev.php"))
 	if err != nil {
@@ -313,18 +309,29 @@ func setDrupalSiteSettingsPaths(app *DdevApp) {
 	app.SiteDdevSettingsFile = filepath.Join(settingsFileBasePath, drupalConfig.SitePath, drupalConfig.SiteSettingsDdev)
 }
 
-// GetDrupalVersion finds the drupal8+ version so it can be used
+// GetDrupalVersion finds the drupal version so it can be used
 // for setting requirements.
-// It can only work if there is configured Drupal8+ code
+// For explicit versioned types (drupal6-drupal12), returns the version from app.Type.
+// For the generic "drupal" type, detects from core/lib/Drupal.php if available.
 func GetDrupalVersion(app *DdevApp) (string, error) {
-	// For drupal6/7 we use the apptype provided as version
+	// For explicitly versioned types, return the version from the configured type
 	switch app.Type {
 	case nodeps.AppTypeDrupal6:
 		return "6", nil
 	case nodeps.AppTypeDrupal7:
 		return "7", nil
+	case nodeps.AppTypeDrupal8:
+		return "8", nil
+	case nodeps.AppTypeDrupal9:
+		return "9", nil
+	case nodeps.AppTypeDrupal10:
+		return "10", nil
+	case nodeps.AppTypeDrupal11:
+		return "11", nil
+	case nodeps.AppTypeDrupal12:
+		return "12", nil
 	}
-	// Otherwise figure out the version from existing code
+	// For generic "drupal" type, detect from existing code
 	f := filepath.Join(app.GetAbsDocroot(false), "core/lib/Drupal.php")
 	hasVersion, matches, err := fileutil.GrepStringInFile(f, `const VERSION = '([0-9]+)`)
 	v := ""
