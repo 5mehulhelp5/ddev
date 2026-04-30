@@ -209,48 +209,46 @@ You’ll need a Docker provider on your system before you can [install DDEV](dde
 
     ## Windows
 
-    For initial installation of DDEV on Windows, you can use one of the following Docker providers:
+    For DDEV on Windows, choose one of these Docker providers:
 
-    * Docker CE inside WSL2 - The most popular, performant, and best-supported way to run DDEV on Windows. No additional software is required; Docker CE will be installed by the DDEV installer. This approach does not work for traditional Windows (non-WSL2) installations.
-    * Docker Desktop for Windows - A popular choice that works with both traditional Windows and WSL2. It has extensive automated testing with DDEV, but has some performance and reliability problems. It is not open-source and may require a license for many users. This approach works for both traditional Windows and WSL2 installations.
-    * Rancher Desktop for Windows - A free and open-source Docker provider that has been manually tested with DDEV on traditional Windows, but does not have automated testing. This approach works for both traditional Windows and WSL2 installations.
+    * **Docker CE inside WSL2** - The most popular, performant, and best-supported way to run DDEV on Windows. The [DDEV installer](ddev-installation.md#windows) installs Docker CE automatically. Requires WSL2.
+    * **Docker Desktop for Windows** - Works with both WSL2 and traditional Windows. Extensive automated testing with DDEV, but has some performance and reliability problems. Not open-source; may require a license for many users.
+    * **Rancher Desktop for Windows** - Free and open-source. Manually tested with DDEV on traditional Windows; no automated testing. Works with both WSL2 and traditional Windows.
 
-    ### Using the Windows Installer
+    ### Install WSL2
 
-    The easiest way to install DDEV on Windows is to use the Windows installer, which can handle different installation scenarios:
+    In PowerShell, run:
 
-    1. **Download the Windows installer**. Make sure to download the correct installer for your system architecture:
+    ```powershell
+    # Install WSL2; reboot if prompted, then continue:
+    wsl --install --no-distribution
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; text-align: center;">
-        [Download for AMD64 :material-microsoft-windows:<br>(Intel/AMD) :material-download:](https://ddev.com/download/ddev_windows_amd64_installer.exe "For computers with Intel or AMD processors (most common)"){ .md-button .md-button--primary }
-        [Download for ARM64 :material-microsoft-windows:<br>(Snapdragon) :material-download:](https://ddev.com/download/ddev_windows_arm64_installer.exe "For computers with ARM processors like Qualcomm Snapdragon"){ .md-button .md-button--primary }
-        </div>
+    # Update WSL2 if previously installed:
+    wsl --update
+    ```
 
-        - **AMD64 (x86-64)**: Most traditional Windows PCs (Intel/AMD processors)
-        - **ARM64**: Windows on ARM devices like Microsoft Surface Pro X, Surface Pro 9 (5G), or other ARM-based Windows devices
+    Create an Ubuntu distro (skip if you're using Traditional Windows):
 
-        Or browse all versions on the [DDEV releases page](https://github.com/ddev/ddev/releases).
+    ```powershell
+    # You'll be asked to set a username and password for the distro:
+    wsl --install Ubuntu --name DDEV
+    ```
 
-        !!!tip "Check your system architecture"
-            Not sure which architecture you have? Open PowerShell and run: `$env:PROCESSOR_ARCHITECTURE`. It will show `AMD64` or `ARM64`. Alternatively, in WSL2/Ubuntu run `uname -m` which shows `x86_64` for AMD64 or `aarch64` for ARM64.
+    !!!tip "\"DDEV\" is just a suggested name — use any name you like."
 
-    2. **Run the installer** and choose your installation type:
-       - **Docker CE inside WSL2** (Recommended): The installer will automatically install Docker CE in your WSL2 environment. This is the fastest and most reliable option.
-       - **Docker Desktop**: Choose this if you already have Docker Desktop installed or prefer to use it.
-       - **Rancher Desktop**: Choose this if you already have Rancher Desktop installed.
-       - **Traditional Windows**: Choose this for non-WSL2 installations (requires Docker Desktop or Rancher Desktop).
+    Verify the "DDEV" distro is set as default:
 
-    The installer will automatically configure DDEV for your chosen Docker provider and WSL2 environment.
+    ```powershell { .no-copy }
+    > wsl -l -v
+      NAME                   STATE           VERSION
+    * DDEV                   Stopped         2
+    ```
 
-    ### Manual Installation Options
+    ### Docker CE inside WSL2
 
-    If you prefer to install manually or need more control over the installation process, you can use the following approaches:
+    The [DDEV Windows installer](ddev-installation.md#step-2-install-ddev) automatically installs Docker CE in your WSL2 environment — no manual Docker installation is needed. After installing WSL2 above, proceed to [install DDEV](ddev-installation.md#step-2-install-ddev).
 
-    #### Docker CE inside WSL2
-
-    No additional software is required to run DDEV on Windows with Docker CE inside WSL2. The DDEV installer will install Docker CE for you. This is the most popular, performant, and best-supported way to run DDEV on Windows.
-
-    To install manually, open your WSL2 terminal (Ubuntu) and run:
+    To install Docker CE manually instead, open your WSL2 terminal (Ubuntu) and run:
 
     ```bash
     # Ensure sudo credentials are cached for copy/paste of this block
@@ -308,7 +306,7 @@ You’ll need a Docker provider on your system before you can [install DDEV](dde
 
         Review the script, then run it: `bash /tmp/install-docker.sh`
 
-    #### Docker Desktop for Windows
+    ### Docker Desktop for Windows
 
     1. Download and install Docker Desktop from [docker.com](https://www.docker.com/products/docker-desktop).
     2. During installation, ensure "Use WSL 2 instead of Hyper-V" is selected.
@@ -317,7 +315,7 @@ You’ll need a Docker provider on your system before you can [install DDEV](dde
     5. Apply the changes and restart Docker Desktop if prompted.
     6. Verify that `docker ps` works in git-bash, PowerShell, or WSL2, wherever you're using it.
 
-    #### Rancher Desktop for Windows
+    ### Rancher Desktop for Windows
 
     1. Download and install [Rancher Desktop](https://rancherdesktop.io/).
     2. During installation, choose **Docker** as the container runtime and disable Kubernetes.
